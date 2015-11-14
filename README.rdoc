@@ -1,3 +1,14 @@
+= RanieroRusso
+
+This is a forked copy which includes my refactored /koans/about_*.rb files.
+
+In order to run the koans tests, follow the Installing Ruby section if you
+need to get Ruby (and Rake) set up on your machine.
+
+Then run the 'rake' command in a terminal from the /ruby_koans root directory.
+
+-----------------------------------------------------------------------------------
+
 = Neo Ruby Koans
 
 The Ruby Koans walk you along the path to enlightenment in order to learn Ruby.
