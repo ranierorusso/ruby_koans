@@ -36,6 +36,7 @@ class AboutSymbols < Neo::Koan
   # We do the comparison with the following statement: 
   # assert_equal true, Symbol.all_symbols.include?(:some_method)
   #
+  # rr: Consider the case where the method does not exist. When ruby executes this
   # line, it will have to first generate the :some_method symbol in order to 
   # compare that object against all symbols returned by Symbol.all_symbols. 
   # However in generating that object, it will automatically then be added to 
@@ -46,6 +47,7 @@ class AboutSymbols < Neo::Koan
     def test_constants_become_symbols
       all_symbols_as_strings = Symbol.all_symbols.map { |x| x.to_s }
 
+      assert_equal true, all_symbols_as_strings.include?("RubyConstant")
     end
   end
 
@@ -57,33 +59,33 @@ class AboutSymbols < Neo::Koan
   def test_symbols_with_spaces_can_be_built
     symbol = :"cats and dogs"
 
-    assert_equal __.to_sym, symbol
+    assert_equal "cats and dogs".to_sym, symbol
   end
 
   def test_symbols_with_interpolation_can_be_built
     value = "and"
     symbol = :"cats #{value} dogs"
 
-    assert_equal __.to_sym, symbol
+    assert_equal "cats and dogs".to_sym, symbol
   end
 
   def test_to_s_is_called_on_interpolated_symbols
     symbol = :cats
     string = "It is raining #{symbol} and dogs."
 
-    assert_equal __, string
+    assert_equal "It is raining cats and dogs.", string
   end
 
   def test_symbols_are_not_strings
     symbol = :ruby
-    assert_equal __, symbol.is_a?(String)
-    assert_equal __, symbol.eql?("ruby")
+    assert_equal false, symbol.is_a?(String)
+    assert_equal false, symbol.eql?("ruby")
   end
 
   def test_symbols_do_not_have_string_methods
     symbol = :not_a_string
-    assert_equal __, symbol.respond_to?(:each_char)
-    assert_equal __, symbol.respond_to?(:reverse)
+    assert_equal false, symbol.respond_to?(:each_char)
+    assert_equal false, symbol.respond_to?(:reverse)
   end
 
   # It's important to realize that symbols are not "immutable
@@ -92,16 +94,24 @@ class AboutSymbols < Neo::Koan
 
   def test_symbols_cannot_be_concatenated
     # Exceptions will be pondered further down the path
-    assert_raise(___) do
+    assert_raise(NoMethodError) do
       :cats + :dogs
     end
   end
 
   def test_symbols_can_be_dynamically_created
-    assert_equal __, ("cats" + "dogs").to_sym
+    assert_equal :catsdogs, ("cats" + "dogs").to_sym
   end
 
   # THINK ABOUT IT:
   #
-  # Why is it not a good idea to dynamically create a lot of symbols?
+  # Why is it not a good idea to dynamically create a lot of symbols
+  #
+  # rr: Symbols are memory optimized. They are only put into memory 
+  # once and persist there until program execution ends. This makes
+  # them efficient to use for things like keys in hashes but will 
+  # cause memory bloat if overused since that memory is not freed by
+  # GC.
+  # Rule of thumb is don't use symbols if you will repeatedly need to 
+  # modify them.
 end
